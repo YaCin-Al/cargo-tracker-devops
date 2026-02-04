@@ -15,9 +15,7 @@ pipeline {
 
         stage('Build & Test with Coverage') {
             steps {
-                withmaven(maven: 'Maven 3.8.4') {
-                    bat 'mvn clean verify'
-                }
+                bat 'mvn clean verify'
             }
         }
 
