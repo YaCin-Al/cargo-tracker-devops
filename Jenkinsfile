@@ -1,33 +1,36 @@
 pipeline {
     agent any
 
-    triggers {
-        githubPush()   
+    tools {
+        maven 'Maven_3' // Your working Maven tool
     }
 
     stages {
-
         stage('Clone') {
             steps {
                 git branch: 'main', url: 'https://github.com/YaCin-Al/cargo-tracker-devops.git'
             }
         }
 
-        stage('Build & Test with Coverage') {
+        stage('Build & Test') {
             steps {
                 bat 'mvn clean verify'
             }
         }
 
-        
+        // NEW STAGE FOR SONARQUBE
+        stage('SonarQube Analysis') {
+            steps {
+                // This 'withSonarQubeEnv' must match the Server Name from Step 1
+                withSonarQubeEnv('SonarLocal') {
+                    bat 'mvn sonar:sonar'
+                }
+            }
+        }
     }
-//
+
     post {
-        success {
-            echo 'Build et analyse terminés avec succès !'
-        }
-        failure {
-            echo 'Échec du build ou des tests.'
-        }
+        success { echo 'Analyse SonarQube terminée !' }
+        failure { echo 'Le build ou l\'analyse a échoué.' }
     }
 }
